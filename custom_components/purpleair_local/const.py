@@ -34,8 +34,8 @@ SENSORS_MAP = {
 SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
 
 MANUFACTURER = 'Purple Air'
-DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air'
-DOMAIN = "purpleair"
+DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air_local'
+DOMAIN = "purpleair_local"
 TEMP_ADJUSTMENT = -8  # From PurpleAir javascript: `(parseInt(temp) + -8).toFixed(0);`
 HUMIDITY_ADJUSTMENT = +4  # From PurpleAir javascript: `(hum = parseInt(hum) + 4) > 100 && (hum = 100)`
 
