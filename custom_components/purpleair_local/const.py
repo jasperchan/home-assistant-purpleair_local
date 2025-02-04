@@ -1,5 +1,5 @@
 """Constants for the Purple Air integration."""
-from homeassistant.const import TEMP_FAHRENHEIT, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI
+from homeassistant.const import UnitOfTemperature.FAHRENHEIT, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
@@ -26,8 +26,8 @@ SENSORS_MAP = {
     'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:weather-hazy'},
     'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:weather-hazy'},
     'humidity':                {'key': 'current_humidity', 'uom': PERCENTAGE,       'icon': 'mdi:water-percent'},
-    'temperature':             {'key': 'current_temp',     'uom': TEMP_FAHRENHEIT,  'icon': 'mdi:thermometer'},
-    'dewpoint':                {'key': 'current_dewpoint', 'uom': TEMP_FAHRENHEIT,  'icon': 'mdi:water-outline'},
+    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:thermometer'},
+    'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': PRESSURE_HPA,     'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi'}
 }
