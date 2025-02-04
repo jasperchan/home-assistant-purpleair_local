@@ -1,5 +1,5 @@
 """Constants for the Purple Air integration."""
-from homeassistant.const import UnitOfTemperature, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI
+from homeassistant.const import UnitOfTemperature, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, UnitOfPressure, PERCENTAGE, DEVICE_CLASS_AQI
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
@@ -28,7 +28,7 @@ SENSORS_MAP = {
     'humidity':                {'key': 'current_humidity', 'uom': PERCENTAGE,       'icon': 'mdi:water-percent'},
     'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:thermometer'},
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:water-outline'},
-    'pressure':                {'key': 'pressure',         'uom': PRESSURE_HPA,     'icon': 'mdi:gauge'},
+    'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA,     'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi'}
 }
 SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
