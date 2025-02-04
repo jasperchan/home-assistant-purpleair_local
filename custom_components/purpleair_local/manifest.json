@@ -4,7 +4,7 @@
   "version": "2.0.5",
   "iot_class": "local_polling",
   "config_flow": true,
-  "documentation": "https://github.com/GenuineAffect/home-assistant-purpleair",
+  "documentation": "https://github.com/GenuineAffect/home-assistant-purpleair_local",
   "requirements": [],
   "ssdp": [],
   "zeroconf": [],
@@ -12,6 +12,7 @@
   "dependencies": [],
   "codeowners": [
     "@gibwar",
-    "@catchdave"
+    "@catchdave",
+    "@GenuineAffect"
   ]
 }
