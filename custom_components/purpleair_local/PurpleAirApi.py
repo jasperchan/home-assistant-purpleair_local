@@ -198,16 +198,18 @@ class PurpleAirApi:
                 'is_dual': is_dual
             }
             for index, entity_desc in SENSORS_MAP.items():
+                key = entity_desc['key']
                 if entity_desc['is_dual']:
-                    key_a = entity_desc['key']
-                    key_b = f"{key_a}_b"
+                    key_a = key
+                    key_b = f"{key}_b"
+                    key_avg = f"{key}_avg"
                     if key_a in result and key_b in result:
-                        nodes[pa_sensor_id][f'{index}_a'] = result[key_a]
-                        nodes[pa_sensor_id][f'{index}_b'] = result[key_b]
-                        nodes[pa_sensor_id][f'{index}_avg'] = (result[key_a]+result[key_b])/2
+                        nodes[pa_sensor_id][key_a] = result[key_a]
+                        nodes[pa_sensor_id][key_b] = result[key_b]
+                        nodes[pa_sensor_id][key_avg] = (result[key_a]+result[key_b])/2
                 else:
-                    if entity_desc['key'] in result:
-                        nodes[pa_sensor_id][index] = result[entity_desc['key']]
+                    if key in result:
+                        nodes[pa_sensor_id][key] = result[key]
             _LOGGER.debug('Json results for %s: %s', pa_sensor_id, result)
             _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 

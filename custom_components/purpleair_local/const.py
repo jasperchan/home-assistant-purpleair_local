@@ -17,13 +17,10 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 
 # Map of sensors to create entities for
 SENSORS_MAP = {
-    # custom
-    'aqi_epa':                 {'key': 'aqi_epa',          'uom': Platform.AIR_QUALITY, 'icon': 'mdi:weather-hazy', 'name': 'AQI (EPA)', 'is_dual': False},
-    'aqi_lrapa':               {'key': 'aqi_lrapa',        'uom': Platform.AIR_QUALITY, 'icon': 'mdi:weather-hazy', 'name': 'AQI (LARAPA)', 'is_dual': False},
     # single sensors
-    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:thermometer', 'name': 'Temperature', 'is_dual': False},
-    'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:water-outline', 'name': 'Dewpoint', 'is_dual': False},
-    'humidity':                {'key': 'current_humidity', 'uom': PERCENTAGE,  'icon': 'mdi:water-percent', 'name': 'Humidity', 'is_dual': False},
+    'temperature':             {'key': 'current_temp_f',     'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:thermometer', 'name': 'Temperature', 'is_dual': False},
+    'dewpoint':                {'key': 'current_dewpoint_f', 'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:water-outline', 'name': 'Dewpoint', 'is_dual': False},
+    'humidity':                {'key': 'current_humidity',   'uom': PERCENTAGE,  'icon': 'mdi:water-percent', 'name': 'Humidity', 'is_dual': False},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA,     'icon': 'mdi:gauge', 'name': 'Pressure', 'is_dual': False},
     'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi', 'name': 'Signal Strength', 'is_dual': False},
     'gas_680':                 {'key': 'gas_680',          'uom': Platform.AIR_QUALITY, 'icon': 'mdi:weather-hazy', 'name': 'VOC IAQ', 'is_dual': False},

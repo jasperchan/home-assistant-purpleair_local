@@ -28,6 +28,7 @@ async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
             }
             entity_desc_a = {
                 **entity_desc,
+                'key': f'{entity_desc["key"]}',
                 'name': f'{entity_desc["name"]} A',
             }
             entity_desc_b = {
