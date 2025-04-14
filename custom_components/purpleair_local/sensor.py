@@ -20,7 +20,25 @@ async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
 
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
-        if is_dual or entity_desc['key'] not in SENSORS_DUAL_ONLY:
+        if entity_desc['is_dual'] and is_dual:
+            entity_desc_avg = {
+                **entity_desc,
+                'key': f'{entity_desc["key"]}_avg',
+                'name': f'{entity_desc["name"]}',
+            }
+            entity_desc_a = {
+                **entity_desc,
+                'name': f'{entity_desc["name"]} A',
+            }
+            entity_desc_b = {
+                **entity_desc,
+                'key': f'{entity_desc["key"]}_b',
+                'name': f'{entity_desc["name"]} B',
+            }
+            entities.append(PurpleAirQualitySensor(hass, f"{index}_a", config_entry, entity_desc_a))
+            entities.append(PurpleAirQualitySensor(hass, f"{index}_b", config_entry, entity_desc_b))
+            entities.append(PurpleAirQualitySensor(hass, f"{index}_avg", config_entry, entity_desc_avg))
+        else:
             entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
 
     async_schedule_add_entities(entities)
@@ -37,6 +55,7 @@ class PurpleAirQualitySensor(SensorEntity):
         self._uom = entity_desc['uom']
         self._icon = entity_desc['icon']
         self._src_key = entity_desc['key']
+        self._name = entity_desc['name']
 
         self.idx = index
         self.pa_sensor_id = self._data['id']
@@ -69,10 +88,7 @@ class PurpleAirQualitySensor(SensorEntity):
 
     @property
     def name(self):
-        nice_entity_title = self.idx.replace('_', ' ').title()
-        if 'air_quality_index' in self.idx:
-            left, last = nice_entity_title.rsplit(' ', 1)
-            nice_entity_title = f'{left} ({last.upper()})'
+        nice_entity_title = self._name if self._name else self.idx.replace('_', ' ').title()
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property

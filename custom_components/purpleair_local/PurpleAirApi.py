@@ -8,7 +8,7 @@ from homeassistant.helpers.event import async_track_time_interval, async_track_p
 from homeassistant.util import dt
 
 from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
-    TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT
+    TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT, SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -195,15 +195,19 @@ class PurpleAirApi:
             is_dual = 'pm2.5_aqi_b' in result
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
-                'rssi': result['rssi'],
-                'current_temp_raw': result['current_temp_f'],
-                'current_humidity_raw': result['current_humidity'],
-                'current_dewpoint_raw': result['current_dewpoint_f'],
-                'pressure': result['pressure'],
                 'is_dual': is_dual
             }
-            nodes[pa_sensor_id].update(process_pm_readings(result, is_dual))
-            nodes[pa_sensor_id].update(process_heat_adjustments(result))
+            for index, entity_desc in SENSORS_MAP.items():
+                if entity_desc['is_dual']:
+                    key_a = entity_desc['key']
+                    key_b = f"{key_a}_b"
+                    if key_a in result and key_b in result:
+                        nodes[pa_sensor_id][f'{index}_a'] = result[key_a]
+                        nodes[pa_sensor_id][f'{index}_b'] = result[key_b]
+                        nodes[pa_sensor_id][f'{index}_avg'] = (result[key_a]+result[key_b])/2
+                else:
+                    if entity_desc['key'] in result:
+                        nodes[pa_sensor_id][index] = result[entity_desc['key']]
             _LOGGER.debug('Json results for %s: %s', pa_sensor_id, result)
             _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 
