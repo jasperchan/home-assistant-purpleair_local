@@ -56,9 +56,9 @@ def process_heat_adjustments(json_result):
     new_humid = min(100, json_result['current_humidity'] + HUMIDITY_ADJUSTMENT)
 
     return {
-        'current_temp': new_temp,
+        'current_temp_f': new_temp,
         'current_humidity': new_humid,
-        'current_dewpoint': calc_dewpoint(new_temp, new_humid)
+        'current_dewpoint_f': calc_dewpoint(new_temp, new_humid)
     }
 
 
@@ -197,6 +197,7 @@ class PurpleAirApi:
                 'device_location': result['place'],
                 'is_dual': is_dual
             }
+            # copy fields
             for index, entity_desc in SENSORS_MAP.items():
                 key = entity_desc['key']
                 if entity_desc['is_dual']:
@@ -210,6 +211,9 @@ class PurpleAirApi:
                 else:
                     if key in result:
                         nodes[pa_sensor_id][key] = result[key]
+            # adjustments
+            nodes[pa_sensor_id].update(process_heat_adjustments(result))
+            # debug
             _LOGGER.debug('Json results for %s: %s', pa_sensor_id, result)
             _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 
