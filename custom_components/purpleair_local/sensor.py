@@ -4,7 +4,7 @@ import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.sensor import SensorEntity
 
-from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP, SENSORS_DUAL_ONLY, MODEL_PA_FLEX, MODEL_PA_2
+from .const import DISPATCHER, DOMAIN, MANUFACTURER, SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,15 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
     _LOGGER.debug('Registering aqi sensor with data: %s', config_entry.data)
 
-    # Backwards compat for sensors added before 'is_dual' key created in config_flow
-    if 'is_dual' in config_entry.data:
-        is_dual = config_entry.data['is_dual']
-    else:
-        is_dual = config_entry.data['model'] in [MODEL_PA_FLEX, MODEL_PA_2]  # Backup to test for dual sensors
-
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
-        if entity_desc['is_dual'] and is_dual:
+        if entity_desc['is_dual']:
             entity_desc_avg = {
                 **entity_desc,
                 'key': f'{entity_desc["key"]}_avg',
@@ -62,6 +56,7 @@ class PurpleAirQualitySensor(SensorEntity):
         self.pa_sensor_id = self._data['id']
         self.pa_sensor_name = self._data['title']
         self.pa_ip_address = self._data['ip_address']
+        self.pa_hw = self._data['hw']
 
     @property
     def device_info(self):
@@ -73,7 +68,7 @@ class PurpleAirQualitySensor(SensorEntity):
            },
            "name": f'{self.pa_sensor_name} {MANUFACTURER}',
            "manufacturer": MANUFACTURER,
-           "model": f'{self._data["model"]} ({self.pa_ip_address})',
+           "model": f'{self._data["model"]} ({self.pa_ip_address}, {self.pa_hw})',
            "sw_version": self._data['sw_version'],
            "hw_version": self._data['hw_version']
         }
@@ -116,7 +111,7 @@ class PurpleAirQualitySensor(SensorEntity):
         self._api.register_node(self.pa_sensor_id, self.pa_ip_address)
         self._stop_listening = async_dispatcher_connect(
             self._hass,
-            DISPATCHER_PURPLE_AIR,
+            DISPATCHER,
             self.async_write_ha_state
         )
 

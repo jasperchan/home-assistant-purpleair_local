@@ -7,7 +7,7 @@ from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_IP_ADDRESS, CONF_NAME
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DOMAIN, LOCAL_URL_FORMAT, PMS_SENSOR, BME_SENSOR, MODEL_PA_1, MODEL_PA_2, MODEL_PA_FLEX
+from .const import DOMAIN, LOCAL_URL_FORMAT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,10 @@ async def validate_input(hass: core.HomeAssistant, data):
             raise InvalidIp(resp)
 
         json = await resp.json()
+        
+    # parse hardware
+    hw = json['hardwarediscovered'].split('+')
+    hw = [item for item in hw if item not in ['3.0', 'OPENLOG', 'NO-DISK']]
 
     config = {
         'title': name,
@@ -43,22 +47,13 @@ async def validate_input(hass: core.HomeAssistant, data):
         'ip_address': ip_address,
         'sw_version': json['version'],
         'hw_version': json['hardwareversion'],
-        'model': get_model_name(json['hardwarediscovered']),
-        'is_dual': ('pm2.5_aqi_b' in json)
+        'hw': ', '.join(hw),
+        'model': 'PA-ZEN',
+        'is_dual': True
     }
 
     _LOGGER.debug('generated config data: %s', config)
     return config
-
-
-def get_model_name(hardwarediscovered):
-    if hardwarediscovered.count(PMS_SENSOR) == 1:
-        return MODEL_PA_1
-
-    if hardwarediscovered.count(BME_SENSOR) > 1:
-        return MODEL_PA_FLEX
-
-    return MODEL_PA_2
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):

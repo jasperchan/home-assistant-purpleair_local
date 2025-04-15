@@ -7,31 +7,10 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
+from .const import DISPATCHER, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
     TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT, SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def calc_aqi(value, index):
-    if index not in AQI_BREAKPOINTS:
-        _LOGGER.debug('calc_aqi requested for unknown type: %s', index)
-        return None
-
-    bp = next((bp for bp in AQI_BREAKPOINTS[index] if bp['pm_low'] <= value <= bp['pm_high']), None)
-    if not bp:
-        _LOGGER.debug('value %s did not fall in valid range for type %s', value, index)
-        return None
-
-    aqi_range = bp['aqi_high'] - bp['aqi_low']
-    pm_range = bp['pm_high'] - bp['pm_low']
-    c = value - bp['pm_low']
-    return round((aqi_range/pm_range) * c + bp['aqi_low'])
-
-
-# LRAPA conversion using the same formula as used by PurpleAir's map as of 2020-09-06
-def lrapa(value):
-    return max(0, 0.5 * value - 0.66)
 
 
 def calc_dewpoint(temp_f, humidity):
@@ -60,48 +39,6 @@ def process_heat_adjustments(json_result):
         'current_humidity': new_humid,
         'current_dewpoint_f': calc_dewpoint(new_temp, new_humid)
     }
-
-
-def process_pm_readings(json_result, is_dual = False):
-    """Processes Particle mass readings and confidence of said readings"""
-    readings = {'pm2_5_aqi_raw': json_result['pm2.5_aqi']}
-    if is_dual:
-        readings['pm2_5_aqi_b_raw'] = json_result['pm2.5_aqi_b']
-
-    for prop in PARTICLE_PROPS:
-        if prop not in json_result:
-            readings[prop] = None
-            continue
-
-        a = float(json_result[prop])
-        prop_b = prop + '_b'  # Property name for sensor B
-        if is_dual and prop_b in json_result:
-            (value, confidence) = process_dual_sensor_readings(a, float(json_result[prop_b]))
-        else:
-            value = a
-            confidence = 'Good'
-
-        readings[prop] = value
-        readings[f'{prop}_conf'] = confidence
-
-    readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
-    readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
-    return readings
-
-def process_dual_sensor_readings(a, b):
-    value = round((a + b) / 2, 1)
-
-    if abs(a - b) < 45:
-        confidence = 'Good'
-    elif abs(a - b) > 300:
-        # If the readings are so severly different, one is probably affected by a
-        # physical obstuction (spider?), so just throw it away and use the smaller value.
-        confidence = 'Severe'
-        value = min(a, b)
-    else:
-        confidence = 'Questionable'
-
-    return (value, confidence)
 
 
 class PurpleAirApi:
@@ -192,10 +129,8 @@ class PurpleAirApi:
         nodes = {}
         for result in results:
             pa_sensor_id = result['SensorId']
-            is_dual = 'pm2.5_aqi_b' in result
             nodes[pa_sensor_id] = {
-                'device_location': result['place'],
-                'is_dual': is_dual
+                'device_location': result['place']
             }
             # copy fields
             for index, entity_desc in SENSORS_MAP.items():
@@ -218,4 +153,4 @@ class PurpleAirApi:
             _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 
         self._data = nodes
-        async_dispatcher_send(self._hass, DISPATCHER_PURPLE_AIR)
+        async_dispatcher_send(self._hass, DISPATCHER)
