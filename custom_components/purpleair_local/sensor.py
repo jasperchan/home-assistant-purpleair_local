@@ -93,7 +93,7 @@ class PurpleAirQualitySensor(SensorEntity):
 
     @property
     def state_class(self):
-        return 'measurement' if self._uom is not None else None
+        return 'measurement'
 
     @property
     def unique_id(self):
